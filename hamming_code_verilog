@@ -1,0 +1,33 @@
+module project ( 
+input  [3:0] data_in, 
+input  [6:0] received_data, 
+output reg [6:0] encoded_data, 
+output reg [3:0] corrected_data, 
+output reg error_detected 
+); 
+reg [6:0] corrected_bits; 
+reg [2:0] syndrome; 
+ 
+always @(*) begin 
+encoded_data[0] = data_in[0] ^ data_in[1] ^ data_in[3]; 
+encoded_data[1] = data_in[0] ^ data_in[2] ^ data_in[3]; 
+encoded_data[2] = data_in[0]; 
+encoded_data[3] = data_in[1] ^ data_in[2] ^ data_in[3]; 
+11  
+encoded_data[4] = data_in[1]; 
+encoded_data[5] = data_in[2]; 
+encoded_data[6] = data_in[3]; 
+end 
+always @(*) begin 
+corrected_bits = received_data; 
+syndrome[0] = received_data[0] ^ received_data[2] ^ received_data[4] ^ received_data[6]; 
+syndrome[1] = received_data[1] ^ received_data[2] ^ received_data[5] ^ received_data[6]; 
+syndrome[2] = received_data[3] ^ received_data[4] ^ received_data[5] ^ received_data[6]; 
+error_detected = (syndrome != 3'b000); 
+if (error_detected) begin 
+corrected_bits[syndrome - 1] = ~corrected_bits[syndrome - 1]; 
+end 
+corrected_data = {corrected_bits[6], corrected_bits[5], corrected_bits[4], 
+corrected_bits[2]}; 
+end 
+     endmodule
