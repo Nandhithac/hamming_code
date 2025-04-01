@@ -1,0 +1,53 @@
+module project_tb; 
+reg [3:0] data_in; 
+reg [6:0] received_data; 
+wire [6:0] encoded_data; 
+wire [3:0] corrected_data; 
+wire error_detected; 
+project dut ( 
+.data_in(data_in), 
+.received_data(received_data), 
+.encoded_data(encoded_data), 
+.corrected_data(corrected_data), 
+.error_detected(error_detected) 
+); 
+initial begin 
+$dumpfile("project_tb.vcd"); 
+$dumpvars(0, project_tb); 
+data_in = 4'b1011; 
+#10; 
+received_data = encoded_data; 
+#10; 
+12  
+$display("Test 1: No Error | Data=%b, Encoded=%b, Received=%b, 
+Corrected=%b, Error=%b", 
+data_in, encoded_data, received_data, corrected_data, error_detected); 
+received_data = encoded_data; 
+received_data[2] = ~received_data[2]; 
+#10; 
+$display("Test 2: Single-bit Error in Data | Data=%b, Encoded=%b, 
+Received=%b, Corrected=%b, Error=%b", 
+data_in, encoded_data, received_data, corrected_data, error_detected); 
+received_data = encoded_data; 
+received_data[0] = ~received_data[0]; 
+#10; 
+$display("Test 3: Single-bit Error in Parity | Data=%b, Encoded=%b, 
+Received=%b, Corrected=%b, Error=%b", 
+data_in, encoded_data, received_data, corrected_data, error_detected); 
+received_data = encoded_data; 
+received_data[1] = ~received_data[1]; 
+received_data[3] = ~received_data[3]; 
+#10; 
+$display("Test 4: Two-bit Error | Data=%b, Encoded=%b, Received=%b, 
+Corrected=%b, Error=%b", 
+data_in, encoded_data, received_data, corrected_data, error_detected); 
+data_in = 4'b0000; 
+#10; 
+received_data = encoded_data; 
+#10; 
+$display("New Test: Simple No Error | Data=%b, Encoded=%b, 
+Received=%b, Corrected=%b, Error=%b", 
+data_in, encoded_data, received_data, corrected_data, error_detected); 
+$finish; 
+end 
+     endmodule 
